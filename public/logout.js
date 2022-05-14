@@ -6,6 +6,7 @@ function Logout(props) {
             firebase.auth().signOut();
         props.setLoginPopup(false); //If it was logged in with OAuth then reset loginPopup
         window.location.href = "#/CreateAccount";
+        props.setBalance(0);
     }
 
     return (

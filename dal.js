@@ -1,5 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
-const url         = 'mongodb://localhost:27017';
+
+let url = "monogdb://localhost:27017";
+if(process.env.MONGO_URI) //This will be in heroku
+    url = process.env.MONGO_URI;
+
 let db            = null;
  
 // connect to mongo
@@ -19,6 +23,21 @@ function create(name, email, password){
         collection.insertOne(doc, {w:1}, function(err, result) {
             err ? reject(err) : resolve(doc);
         });    
+    })
+}
+
+//Create an account for an OAuthUser
+function createOAuthUser(name, email, password){
+    return new Promise((resolve, reject) => {
+        db.collection('users')
+            .findOneAndUpdate(
+                {email: email},
+                {$set: {name: name, password: password}}, 
+                {returnOriginal: false},
+                function(err, result) {
+                    err ? reject(err) : resolve(result);
+                }
+            );
     })
 }
 
@@ -76,4 +95,4 @@ function all(){
 }
 
 
-module.exports = {create, findOne, find, update, all};
+module.exports = {create, findOne, find, update, all, createOAuthUser};

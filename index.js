@@ -7,6 +7,13 @@ var dal     = require('./dal.js');
 app.use(express.static('public'));
 app.use(cors());
 
+app.get('/', (req, res) => {
+    res.send('Testing');
+})
+app.get('/account/createOAuthUser/:name/:email/:password', (req, res) => {
+    
+})
+
 // create user account
 app.get('/account/create/:name/:email/:password', function (req, res) {
 
@@ -15,8 +22,17 @@ app.get('/account/create/:name/:email/:password', function (req, res) {
         then((users) => {
             // if user exists, return error message
             if(users.length > 0){
-                console.log('User already in exists');
-                res.send('User already in exists');    
+                if(users[0].name === "OAuthUser") {
+                    dal.createOAuthUser(req.params.name, req.params.email, req.params.password)
+                        .then((response) => {
+                            console.log(response);
+                            res.send(response);
+                        })
+                }
+                else {
+                    console.log('User already in exists');
+                    res.send('User already in exists');    
+                }
             }
             else{
                 // else create user
@@ -70,6 +86,8 @@ app.get('/account/findOne/:email', function (req, res) {
         then((user) => {
             console.log(user);
             res.send(user);
+    }).catch((err) => {
+        console.log(err);
     });
 });
 
@@ -86,6 +104,8 @@ app.get('/account/update/:email/:amount', function (req, res) {
     });    
 });
 
+
+
 // all accounts
 app.get('/account/all', function (req, res) {
 
@@ -96,6 +116,6 @@ app.get('/account/all', function (req, res) {
     });
 });
 
-var port = 3000;
+let port = process.env.PORT || 3000;
 app.listen(port);
 console.log('Running on port: ' + port);

@@ -8,7 +8,7 @@ function Login(props){
       header="Login"
       status={status}
       body={show ? 
-        <LoginForm setBalance={props.setBalance} setLoginEmail={props.setLoginEmail} setShow={setShow} setStatus={setStatus}/> :
+        <LoginForm setLoginPopup={props.setLoginPopup} email={props.email} setBalance={props.setBalance} setLoginEmail={props.setLoginEmail} setShow={setShow} setStatus={setStatus}/> :
         <LoginMsg setLoginEmail={props.setLoginEmail} setShow={setShow} setStatus={setStatus}/>}
     />
   ) 
@@ -49,6 +49,7 @@ function LoginForm(props){
     });
   }
   function handleOAuth(){
+    
     console.log("google sign in clicked");
   
     // TODO: Use firebase.auth.GoogleAuthProvider() to implement Google sign in
@@ -60,10 +61,33 @@ function LoginForm(props){
       props.setShow(false);
       props.setLoginEmail(result.user.email);
       props.setLoginPopup(true);
+      let existingUser = null;
+      fetch(`/account/findOne/${result.user.email}`)
+        .then(response => response.text())
+        .then(async (text) => {
+          if(text == "") {
+            //Create the entry to MongoDB
+            const res = await fetch(`/account/create/OAuthUser/${result.user.email}/OAuthPass`);
+            const data = await res.json();
+            console.log("Created User: ", data);
+            props.setBalance(0);
+          } 
+          else {
+            const data = JSON.parse(text);
+            props.setBalance(data.balance);
+          }
+        })
     })
       .catch((e) => console.log(e.message));
+
+    
   }
 
+  function validateEntry() {
+    if(!email || !password)
+      return true;
+    return false;
+  }
 
   return (<>
 
@@ -81,7 +105,7 @@ function LoginForm(props){
       value={password} 
       onChange={e => setPassword(e.currentTarget.value)}/><br/>
 
-    <button type="submit" className="btn btn-light" onClick={handle}>Login</button><br/>
+    <button disabled={validateEntry()} type="submit" className="btn btn-light" onClick={handle}>Login</button><br/>
     <button id="googlelogin" type="submit" className="btn btn-light" onClick={handleOAuth}>Login with Google</button>
    
   </>);

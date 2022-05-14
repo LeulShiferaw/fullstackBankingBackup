@@ -8,7 +8,7 @@ function CreateAccount(){
       header="Create Account"
       status={status}
       body={show ? 
-        <CreateForm setShow={setShow}/> : 
+        <CreateForm setStatus={setStatus} setShow={setShow}/> : 
         <CreateMsg setShow={setShow}/>}
     />
   )
@@ -29,6 +29,15 @@ function CreateForm(props){
   const [password, setPassword] = React.useState('');
 
   function handle(){
+    if(name === "OAuthUser") // This is used by the system database for other purposes
+    {
+      props.setStatus("Error: OAuthUser is used by the internal system");
+      setTimeout(() => {
+        props.setStatus('');
+      }, 2000)
+      return;
+    }
+
     console.log(name,email,password);
     const url = `/account/create/${name}/${email}/${password}`;
     (async () => {
@@ -38,6 +47,12 @@ function CreateForm(props){
     })();
     props.setShow(false);
   }    
+
+  function validateEntry() {
+    if(!name || !email || !password)
+      return true;
+    return false;
+  }
 
   return (<>
 
@@ -62,7 +77,7 @@ function CreateForm(props){
       value={password} 
       onChange={e => setPassword(e.currentTarget.value)}/><br/>
 
-    <button type="submit" 
+    <button disabled={validateEntry()} type="submit" 
       className="btn btn-light" 
       onClick={handle}>Create Account</button>
 

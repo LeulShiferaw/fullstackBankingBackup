@@ -10,7 +10,7 @@ function Spa() {
             <Route path="/" exact component={Home} />
             <Route path="/CreateAccount/" component={CreateAccount} />
             <Route path="/login/" >
-              <Login setBalance={setBalance} setLoginEmail={setLoginEmail} setLoginPopup={setLoginPopup}/>
+              <Login setBalance={setBalance} email={login_email} setLoginEmail={setLoginEmail} setLoginPopup={setLoginPopup}/>
             </Route>
             <Route path="/deposit/">
               <Deposit email={login_email} balance={balance} setBalance={setBalance}/>
@@ -24,7 +24,7 @@ function Spa() {
             </Route>
             <Route path="/alldata/" component={AllData} />
             <Route path="/logout/">
-              <Logout setLoginEmail={setLoginEmail} popup={loginPopup} setLoginPopup={setLoginPopup}/>
+              <Logout setBalance={setBalance} setLoginEmail={setLoginEmail} popup={loginPopup} setLoginPopup={setLoginPopup}/>
             </Route>
           </div>
       </div>
